@@ -1,0 +1,12 @@
+{
+  "Emails": [
+    {
+      "Name": "Yaroslav",
+      "Address": "yar-sukhanov@yandex.ru"
+    }
+  ],
+  "Checks": {
+    "WebsiteCheck_URL": "ya.ru",
+    "DbCheck_ConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Integrated Security=True;Connect Timeout=5;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+  }
+}
