@@ -1,31 +1,55 @@
 ﻿using System;
 using AvailabilityChecker.Checks;
 using AvailabilityChecker.Email;
+using CommandLine;
 
 namespace AvailabilityChecker
 {
+    public class CommandLineParameters
+    {
+        [Option("show", Default = false, HelpText = "Show results from previous checks")]
+        public bool ShowResults { get; set; }
+        
+        [Option('s', "settings", MetaValue = "PATH", HelpText = "Set path to settings", Default = "settings.json")]
+        public string SettingsPath { get; set; }
+        
+        [Option('r', "results", MetaValue = "PATH", HelpText = "Set path to results", Default = "results.json")]
+        public string ResultsPath { get; set; }
+    }
+
     class Program
     {
         private static readonly ICheck[] _checks = { new WebsiteChecker(), new DbChecker() };
         
-        private const string SETTINGS_PATH = "settings.json";
-        private const string RESULTS_PATH = "results.json";
+        private static string SettingsPath;
+        private static string ResultsPath;
 
-        private const string SETTINGS_LOAD_ERROR_TEXT = "Failed to load settings from " + SETTINGS_PATH;
-        private const string RESULTS_LOAD_ERROR_TEXT = "Failed to load results from " + RESULTS_PATH;
+        private static string SETTINGS_LOAD_ERROR_TEXT = "Failed to load settings from " + SettingsPath;
+        private static string RESULTS_LOAD_ERROR_TEXT = "Failed to load results from " + ResultsPath;
 
-        private const string EXIT_TEXT = "Press any key to exit";
+        private const string EXIT_TEXT = "Press any key to continue...";
 
         private const string MESSAGE_SUBJECT = "Check results";
-
-        private const string SHOW_RESULTS_PARAMETER = "--show";
-        
 
         private static Settings settings;
 
         static void Main(string[] args)
         {
-            if (!(args.Length > 0 && args[0] == SHOW_RESULTS_PARAMETER))
+            var parserResult = Parser.Default.ParseArguments<CommandLineParameters>(args);
+            CommandLineParameters cmdParams = parserResult.Value;
+            if (cmdParams is null)
+            {
+                return;
+            }
+            SettingsPath = cmdParams.SettingsPath;
+            ResultsPath = cmdParams.ResultsPath;
+            if (!cmdParams.ShowResults && !TryLoadSettings())
+            {
+                Console.WriteLine(SETTINGS_LOAD_ERROR_TEXT);
+                FinishUI();
+                return;
+            }
+            if (!cmdParams.ShowResults)
             {
                 PerformChecks();
             }
@@ -33,29 +57,30 @@ namespace AvailabilityChecker
             FinishUI();
         }
 
+        static bool TryLoadSettings()
+        {
+            Console.WriteLine("Loading settings...");
+            try
+            {
+                settings = Settings.Load(SettingsPath);
+            }
+            catch
+            {
+                return false;
+            }
+            Console.WriteLine("Settings loaded!");
+            return true;
+        }
+
         static void SendEmails(CheckResultsCollection results)
         {
             string message = results.ToString();
-            string[] attachments = { RESULTS_PATH };
+            string[] attachments = { ResultsPath };
             MailSender.SendEmails(settings.Emails, MESSAGE_SUBJECT, message, attachments);
         }
         
         static void PerformChecks()
         {
-            Console.WriteLine("Loading settings...");
-            try
-            {
-                settings = Settings.Load(SETTINGS_PATH);
-            }
-            catch
-            {
-                Console.WriteLine(SETTINGS_LOAD_ERROR_TEXT);
-                Console.WriteLine(EXIT_TEXT);
-                Console.ReadLine();
-                return;
-            }
-            Console.WriteLine("Settings loaded!");
-
             Console.WriteLine("Performing checks...");
             CheckResultsCollection results = new();
             foreach (var check in _checks)
@@ -69,7 +94,7 @@ namespace AvailabilityChecker
             Console.WriteLine("Checks done!");
 
             Console.WriteLine("Saving settings...");
-            results.SaveAs(RESULTS_PATH);
+            results.SaveAs(ResultsPath);
             Console.WriteLine("Settings saved!");
 
             Console.WriteLine("Sending emails...");
@@ -83,7 +108,7 @@ namespace AvailabilityChecker
 
             try
             {
-                results = CheckResultsCollection.Load(RESULTS_PATH);
+                results = CheckResultsCollection.Load(ResultsPath);
             }
             catch
             {
@@ -95,7 +120,7 @@ namespace AvailabilityChecker
 
         static void FinishUI()
         {
-            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine(EXIT_TEXT);
             Console.ReadKey();
         }
     }
