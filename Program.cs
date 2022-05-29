@@ -1,6 +1,7 @@
 ﻿using System;
 using AvailabilityChecker.Checks;
 using AvailabilityChecker.Email;
+using AvailabilityChecker.Logging;
 using CommandLine;
 
 namespace AvailabilityChecker
@@ -15,6 +16,9 @@ namespace AvailabilityChecker
         
         [Option('r', "results", MetaValue = "PATH", HelpText = "Set path to results", Default = "results.json")]
         public string ResultsPath { get; set; }
+
+        [Option('s', "silent", Default = false, HelpText = "Do not print to the console")]
+        public bool Silent { get; set; }
     }
 
     class Program
@@ -33,8 +37,12 @@ namespace AvailabilityChecker
 
         private static Settings settings;
 
+        private static ILogger logger;
+
         static void Main(string[] args)
         {
+            logger = new ConsoleLogger();
+
             var parserResult = Parser.Default.ParseArguments<CommandLineParameters>(args);
             CommandLineParameters cmdParams = parserResult.Value;
             if (cmdParams is null)
@@ -45,7 +53,7 @@ namespace AvailabilityChecker
             ResultsPath = cmdParams.ResultsPath;
             if (!cmdParams.ShowResults && !TryLoadSettings())
             {
-                Console.WriteLine(SETTINGS_LOAD_ERROR_TEXT);
+                logger?.Log(SETTINGS_LOAD_ERROR_TEXT);
                 FinishUI();
                 return;
             }
@@ -59,7 +67,7 @@ namespace AvailabilityChecker
 
         static bool TryLoadSettings()
         {
-            Console.WriteLine("Loading settings...");
+            logger?.Log("Loading settings...");
             try
             {
                 settings = Settings.Load(SettingsPath);
@@ -68,7 +76,7 @@ namespace AvailabilityChecker
             {
                 return false;
             }
-            Console.WriteLine("Settings loaded!");
+            logger?.Log("Settings loaded!");
             return true;
         }
 
@@ -81,7 +89,7 @@ namespace AvailabilityChecker
         
         static void PerformChecks()
         {
-            Console.WriteLine("Performing checks...");
+            logger?.Log("Performing checks...");
             CheckResultsCollection results = new();
             foreach (var check in _checks)
             {
@@ -91,15 +99,15 @@ namespace AvailabilityChecker
                     results.AddRange(check.Results);
                 }
             }
-            Console.WriteLine("Checks done!");
+            logger?.Log("Checks done!");
 
-            Console.WriteLine("Saving settings...");
+            logger?.Log("Saving settings...");
             results.SaveAs(ResultsPath);
-            Console.WriteLine("Settings saved!");
+            logger?.Log("Settings saved!");
 
-            Console.WriteLine("Sending emails...");
+            logger?.Log("Sending emails...");
             SendEmails(results);
-            Console.WriteLine("Done!");
+            logger?.Log("Done!");
         }
 
         static void ShowResults()
@@ -112,15 +120,15 @@ namespace AvailabilityChecker
             }
             catch
             {
-                Console.WriteLine(RESULTS_LOAD_ERROR_TEXT);
+                logger?.Log(RESULTS_LOAD_ERROR_TEXT);
                 return;
             }
-            Console.WriteLine(results.ToString());
+            logger?.Log(results.ToString());
         }
 
         static void FinishUI()
         {
-            Console.WriteLine(EXIT_TEXT);
+            logger?.Log(EXIT_TEXT);
             Console.ReadKey();
         }
     }
