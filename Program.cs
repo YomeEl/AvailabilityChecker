@@ -6,7 +6,7 @@ namespace AvailabilityChecker
 {
     class Program
     {
-        private static readonly ICheck[] _checks = { new WebsiteCheck(), new DbCheck() };
+        private static readonly ICheck[] _checks = { new WebsiteChecker(), new DbChecker() };
         
         private const string SETTINGS_PATH = "settings.json";
         private const string RESULTS_PATH = "results.json";
@@ -60,10 +60,10 @@ namespace AvailabilityChecker
             CheckResultsCollection results = new();
             foreach (var check in _checks)
             {
-                _ = check.Check(settings.Checks);
-                if (check.Result is not null)
+                check.Check(settings.Checks);
+                if (check.Results is not null)
                 {
-                    results.Add(check.Result);
+                    results.AddRange(check.Results);
                 }
             }
             Console.WriteLine("Checks done!");

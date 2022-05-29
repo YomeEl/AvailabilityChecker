@@ -6,7 +6,12 @@
     }
   ],
   "Checks": {
-    "WebsiteCheck_URL": "ya.ru",
-    "DbCheck_ConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Integrated Security=True;Connect Timeout=5;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+    "WebsiteCheck_URLs": [
+      "ya.ru",
+      "google.com"
+    ],
+    "DbCheck_ConnectionStrings": [
+      "Data Source=(localdb)\\MSSQLLocalDB1;Integrated Security=True;Connect Timeout=5;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+    ]
   }
 }
