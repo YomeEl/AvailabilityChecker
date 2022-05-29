@@ -28,8 +28,8 @@ namespace AvailabilityChecker
         private static string SettingsPath;
         private static string ResultsPath;
 
-        private static string SETTINGS_LOAD_ERROR_TEXT = "Failed to load settings from " + SettingsPath;
-        private static string RESULTS_LOAD_ERROR_TEXT = "Failed to load results from " + ResultsPath;
+        private static string SETTINGS_LOAD_ERROR_TEXT => $"Failed to load settings from {SettingsPath}";
+        private static string RESULTS_LOAD_ERROR_TEXT => $"Failed to load results from {ResultsPath}";
 
         private const string EXIT_TEXT = "Press any key to continue...";
 
