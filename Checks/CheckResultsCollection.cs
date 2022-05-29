@@ -16,6 +16,16 @@ namespace AvailabilityChecker.Checks
             Results.Add(result);
         }
 
+        public void AddRange(IEnumerable<CheckResult> results)
+        {
+            Results.AddRange(results);
+        }
+
+        public void AddRange(CheckResultsCollection checkResults)
+        {
+            Results.AddRange(checkResults.Results);
+        }
+
         public void SaveAs(string path)
         {
             JsonSerializer serializer = new();
