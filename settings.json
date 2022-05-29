@@ -8,9 +8,11 @@
   "Checks": {
     "WebsiteCheck_URLs": [
       "ya.ru",
-      "google.com"
+      "google.com",
+      "nonexistentwebsite.com"
     ],
     "DbCheck_ConnectionStrings": [
+      "Data Source=(localdb)\\MSSQLLocalDB;Integrated Security=True;Connect Timeout=5;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
       "Data Source=(localdb)\\MSSQLLocalDB1;Integrated Security=True;Connect Timeout=5;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
     ]
   }
