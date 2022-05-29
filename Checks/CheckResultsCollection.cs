@@ -5,8 +5,6 @@ using Newtonsoft.Json;
 
 namespace AvailabilityChecker.Checks
 {
-    public record CheckResult(string Name, string Message);
-
     public class CheckResultsCollection
     {
         public List<CheckResult> Results { get; } = new();
@@ -49,10 +47,7 @@ namespace AvailabilityChecker.Checks
             foreach (var result in Results)
             {
                 sb.AppendLine("=====");
-                sb.AppendLine($"Check:");
-                sb.AppendLine($"\t{result.Name}");
-                sb.AppendLine($"Result:");
-                sb.AppendLine($"\t{result.Message}");
+                sb.AppendLine(result.ToString());
             }
             sb.AppendLine("====");
             return sb.ToString();
