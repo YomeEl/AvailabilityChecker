@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
+using System.Collections.Generic;
 
 namespace AvailabilityChecker.Email
 {

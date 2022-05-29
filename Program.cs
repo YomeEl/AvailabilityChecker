@@ -1,7 +1,9 @@
 ﻿using System;
+
 using AvailabilityChecker.Checks;
 using AvailabilityChecker.Email;
 using AvailabilityChecker.Logging;
+
 using CommandLine;
 
 namespace AvailabilityChecker
@@ -35,13 +37,12 @@ namespace AvailabilityChecker
 
         private const string MESSAGE_SUBJECT = "Check results";
 
-        private static Settings settings;
-
-        private static ILogger logger;
+        private static Settings _settings;
+        private static ILogger _logger;
 
         static void Main(string[] args)
         {
-            logger = new ConsoleLogger();
+            _logger = new ConsoleLogger();
 
             var parserResult = Parser.Default.ParseArguments<CommandLineParameters>(args);
             CommandLineParameters cmdParams = parserResult.Value;
@@ -53,7 +54,7 @@ namespace AvailabilityChecker
             ResultsPath = cmdParams.ResultsPath;
             if (!cmdParams.ShowResults && !TryLoadSettings())
             {
-                logger?.Log(SETTINGS_LOAD_ERROR_TEXT);
+                _logger?.Log(SETTINGS_LOAD_ERROR_TEXT);
                 FinishUI();
                 return;
             }
@@ -67,16 +68,16 @@ namespace AvailabilityChecker
 
         static bool TryLoadSettings()
         {
-            logger?.Log("Loading settings...");
+            _logger?.Log("Loading settings...");
             try
             {
-                settings = Settings.Load(SettingsPath);
+                _settings = Settings.Load(SettingsPath);
             }
             catch
             {
                 return false;
             }
-            logger?.Log("Settings loaded!");
+            _logger?.Log("Settings loaded!");
             return true;
         }
 
@@ -84,30 +85,30 @@ namespace AvailabilityChecker
         {
             string message = results.ToString();
             string[] attachments = { ResultsPath };
-            MailSender.SendEmails(settings.Emails, MESSAGE_SUBJECT, message, attachments);
+            MailSender.SendEmails(_settings.Emails, MESSAGE_SUBJECT, message, attachments);
         }
         
         static void PerformChecks()
         {
-            logger?.Log("Performing checks...");
+            _logger?.Log("Performing checks...");
             CheckResultsCollection results = new();
             foreach (var check in _checks)
             {
-                check.Check(settings.Checks);
+                check.Check(_settings.Checks);
                 if (check.Results is not null)
                 {
                     results.AddRange(check.Results);
                 }
             }
-            logger?.Log("Checks done!");
+            _logger?.Log("Checks done!");
 
-            logger?.Log("Saving settings...");
+            _logger?.Log("Saving settings...");
             results.SaveAs(ResultsPath);
-            logger?.Log("Settings saved!");
+            _logger?.Log("Settings saved!");
 
-            logger?.Log("Sending emails...");
+            _logger?.Log("Sending emails...");
             SendEmails(results);
-            logger?.Log("Done!");
+            _logger?.Log("Done!");
         }
 
         static void ShowResults()
@@ -120,15 +121,15 @@ namespace AvailabilityChecker
             }
             catch
             {
-                logger?.Log(RESULTS_LOAD_ERROR_TEXT);
+                _logger?.Log(RESULTS_LOAD_ERROR_TEXT);
                 return;
             }
-            logger?.Log(results.ToString());
+            _logger?.Log(results.ToString());
         }
 
         static void FinishUI()
         {
-            logger?.Log(EXIT_TEXT);
+            _logger?.Log(EXIT_TEXT);
             Console.ReadKey();
         }
     }

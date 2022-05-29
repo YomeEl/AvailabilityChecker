@@ -13,6 +13,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# TODO list
+todo.txt
+
 # Mono auto generated files
 mono_crash.*
 
