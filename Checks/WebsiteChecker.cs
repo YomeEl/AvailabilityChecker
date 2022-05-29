@@ -11,6 +11,8 @@ namespace AvailabilityChecker.Checks
         private const string KEY = "WebsiteCheck_URLs";
         private const string DISPLAY_NAME = "Website check";
 
+        private Exception _exception;
+
         public WebsiteChecker()
         {
             Results = new();
@@ -33,7 +35,7 @@ namespace AvailabilityChecker.Checks
             }
         }
 
-        private static bool CheckUri(Uri uri)
+        private bool CheckUri(Uri uri)
         {
             using var client = new HttpClient();
             HttpRequestMessage message = new(HttpMethod.Get, uri);
@@ -43,9 +45,10 @@ namespace AvailabilityChecker.Checks
                 using var response = client.Send(message);
                 isAvailable = response?.IsSuccessStatusCode == true;
             }
-            catch
+            catch (Exception e)
             {
                 isAvailable = false;
+                _exception = e;
             }
             return isAvailable;
         }
@@ -53,7 +56,8 @@ namespace AvailabilityChecker.Checks
         private void AddResult(bool isAvailable, string url)
         {
             string message = $"Resource {url} is {(isAvailable ? "" : "not ")}available";
-            Results.Add(new(DISPLAY_NAME, message));
+            string details = _exception?.Message;
+            Results.Add(new(DISPLAY_NAME, message, details));
         }
     }
 }

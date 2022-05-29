@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 
 namespace AvailabilityChecker.Checks
@@ -9,6 +10,8 @@ namespace AvailabilityChecker.Checks
 
         private const string KEY = "DbCheck_ConnectionStrings";
         private const string DISPLAY_NAME = "MS SQL check";
+
+        private Exception _exception;
 
         public DbChecker()
         {
@@ -30,7 +33,7 @@ namespace AvailabilityChecker.Checks
             }
         }
 
-        private static bool CheckConnection(string connectionString)
+        private bool CheckConnection(string connectionString)
         {
             bool result = true;
             try
@@ -38,9 +41,10 @@ namespace AvailabilityChecker.Checks
                 using SqlConnection connection = new(connectionString);
                 connection.Open();
             }
-            catch
+            catch (Exception e)
             {
                 result = false;
+                _exception = e;
             }
             return result;
         }
@@ -48,7 +52,8 @@ namespace AvailabilityChecker.Checks
         private void AddResult(bool isAvailable)
         {
             string message = $"Database with provided connection string is {(isAvailable ? "" : "not ")}available";
-            Results.Add(new(DISPLAY_NAME, message));
+            string details = _exception?.Message;
+            Results.Add(new(DISPLAY_NAME, message, details));
         }
     }
 }
