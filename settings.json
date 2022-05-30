@@ -1,10 +1,22 @@
 {
-  "Emails": [
+  "EmailSender": {
+    "Name": "Availability checker",
+    "Address": "noreply.easypoll@gmail.com",
+    "Password": "liwyiqikhxunawqj",
+    "Host": "smtp.gmail.com",
+    "Port": 587
+  },
+  "EmailReceivers": [
     {
       "Name": "Yaroslav",
       "Address": "yar-sukhanov@yandex.ru"
+    },
+    {
+      "Name": "Somebody",
+      "Address": "incorrect-email"
     }
   ],
+  "EmailMessageSubject": "Check results",
   "Checks": {
     "WebsiteCheck_URLs": [
       "ya.ru",

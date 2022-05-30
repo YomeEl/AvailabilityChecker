@@ -18,9 +18,6 @@ namespace AvailabilityChecker
         
         [Option('r', "results", MetaValue = "PATH", HelpText = "Set path to results", Default = "results.json")]
         public string ResultsPath { get; set; }
-
-        [Option('s', "silent", Default = false, HelpText = "Do not print to the console")]
-        public bool Silent { get; set; }
     }
 
     class Program
@@ -34,8 +31,6 @@ namespace AvailabilityChecker
         private static string RESULTS_LOAD_ERROR_TEXT => $"Failed to load results from {ResultsPath}";
 
         private const string EXIT_TEXT = "Press any key to continue...";
-
-        private const string MESSAGE_SUBJECT = "Check results";
 
         private static Settings _settings;
         private static ILogger _logger;
@@ -85,7 +80,17 @@ namespace AvailabilityChecker
         {
             string message = results.ToString();
             string[] attachments = { ResultsPath };
-            MailSender.SendEmails(_settings.Emails, MESSAGE_SUBJECT, message, attachments);
+            EmailSender sender;
+            try
+            {
+                sender = new(_settings.EmailSender, _settings.EmailReceivers, _logger);
+            }
+            catch (Exception e)
+            {
+                _logger?.Log(e.Message);
+                return;
+            }
+            sender.Send(_settings.EmailMessageSubject, message, attachments);
         }
         
         static void PerformChecks()

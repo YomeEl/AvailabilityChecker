@@ -7,7 +7,9 @@ namespace AvailabilityChecker
 {
     public struct Settings
     {
-        public Reciever[] Emails;
+        public Sender EmailSender;
+        public Receiver[] EmailReceivers;
+        public string EmailMessageSubject;
         public Dictionary<string, string[]> Checks;
 
         public void SaveAs(string path)
