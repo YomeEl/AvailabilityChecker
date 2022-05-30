@@ -17,11 +17,19 @@ namespace AvailabilityChecker.Checks
 
         public void AddRange(IEnumerable<CheckResult> results)
         {
+            if (results is null)
+            {
+                return;
+            }
             Results.AddRange(results);
         }
 
         public void AddRange(CheckResultsCollection checkResults)
         {
+            if (checkResults is null)
+            {
+                return;
+            }
             Results.AddRange(checkResults.Results);
         }
 

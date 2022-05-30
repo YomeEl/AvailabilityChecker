@@ -49,7 +49,7 @@ namespace AvailabilityChecker.Email
                 }
                 else
                 {
-                    _logger?.Log($"Incorrect receiver adress: {receiver}");
+                    _logger?.Log($"Incorrect receiver adress: \"{receiver.Address}\"");
                 }
             }
         }
